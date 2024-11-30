@@ -1,0 +1,146 @@
+generator client {
+ provider = "prisma-client-js"
+ output   = "./src/generated/client"
+}
+ 
+
+datasource db {
+ provider = "mysql"
+ url      = env("DATABASE_URL")
+}
+
+model User {
+    id Int         @id @default(autoincrement())
+    name     String
+    email    String @unique
+    password String
+    phone    String?
+    avatar   String?
+    address  String?
+    level Int @default(0)
+    blogcomments Blogcomment[]
+ 
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    products Product[]
+    bills Bill[]
+    blogs Blog[]
+    rateBlogs RateBlog[]
+}
+
+model Blog {
+    id Int         @id @default(autoincrement())
+    title String
+    image String
+    description String?
+    content String?
+    blogcomments Blogcomment[]
+    id_user Int
+    user User @relation(fields: [id_user], references:[id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    rateBlogs RateBlog[]
+}
+
+model Blogcomment {
+    id Int @id @default(autoincrement())
+    comment String
+    id_blog	Int
+    id_user	Int
+    avatar	String?
+    name	String
+    level Int @default(0)
+    user User @relation(fields: [id_user], references:[id])
+    blog Blog @relation(fields: [id_blog], references:[id])
+    createdAt	DateTime @default(now())
+    updatedAt	DateTime @updatedAt
+
+}
+model Brand {
+    id Int @id @default(autoincrement())
+    brand String
+    slug String
+    status    Int      @default(0)
+    createdAt	DateTime @default(now())
+    updatedAt	DateTime @updatedAt
+    products Product[] 
+
+}
+model Category {
+    id Int @id @default(autoincrement())
+    category String
+    slug     String
+    status    Int      @default(0)
+    createdAt	DateTime @default(now())
+    updatedAt	DateTime @updatedAt
+    products Product[]
+
+
+}
+ model Product {
+    id Int @id @default(autoincrement())
+    name String
+    slug String
+    price Float
+    id_user Int
+    id_category Int
+    id_brand Int
+    status Int @default(0)
+    sale Float @default(0)
+    company String?
+    image_product String? @db.VarChar(1000)
+    detail String? @db.VarChar(2000)
+    user     User     @relation(fields: [id_user]     , references:[id])
+    category Category @relation(fields: [id_category] , references:[id])
+    brand    Brand    @relation(fields: [id_brand]    , references:[id])
+    createdAt	DateTime @default(now())
+    updatedAt	DateTime @updatedAt
+    invoicedetails invoicedetails[]
+ }
+
+model Visitor {
+    id Int         @id @default(autoincrement())
+    codeVisitor    String
+    name     String
+    email    String 
+    phone    String?
+    address  String?
+    createdAt	DateTime @default(now())
+    updatedAt	DateTime @updatedAt
+    bills Bill[]
+}
+model Bill {
+    id Int     @id @default(autoincrement())
+    codeBill    String
+    total Float @default(0)
+    id_Visitor Int 
+    id_user Int  @default(0)
+    status Int @default(0) @map(name: "status")    
+    paymenttype String?
+    createdAt	DateTime @default(now())
+    updatedAt	DateTime @updatedAt
+    visitor Visitor @relation(fields: [id_Visitor], references: [id])
+    user User @relation(fields: [id_user], references: [id])
+    invoicedetails invoicedetails[]
+}
+
+model invoicedetails {
+    id Int     @id @default(autoincrement())
+    id_bill Int
+    id_product Int
+    qty Int
+    bill      Bill     @relation(fields: [id_bill], references: [id])
+    product   Product  @relation(fields: [id_product], references: [id])
+    createdAt	DateTime @default(now())
+    updatedAt	DateTime @updatedAt
+}
+model RateBlog  {
+     id Int     @id @default(autoincrement())
+     id_blog Int
+     id_user Int
+     rate Int
+     user User @relation(fields: [id_user], references:[id])
+     blog Blog @relation(fields: [id_blog], references:[id])
+}
+
